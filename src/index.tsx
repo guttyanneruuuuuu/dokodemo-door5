@@ -119,7 +119,7 @@ app.get('/', (c) => {
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=IBM+Plex+Mono:wght@300;400;500&family=Shippori+Mincho:wght@400;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/static/warpdoor.css" />
+  <link rel="stylesheet" href="/static/warpdoor-v8.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚪</text></svg>" />
 </head>
 <body>
@@ -131,7 +131,7 @@ app.get('/', (c) => {
     }
   }
   </script>
-  <script type="module" src="/static/warpdoor.js"></script>
+  <script type="module" src="/static/warpdoor-v8.js"></script>
 </body>
 </html>`)
 })
