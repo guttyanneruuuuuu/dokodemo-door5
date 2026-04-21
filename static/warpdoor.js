@@ -2,8 +2,8 @@
 // WARPDOOR ULTRA — main entry
 // ============================================================
 import * as THREE from 'three';
-import { WORLDS, getWorld } from '/static/worlds.js';
-import { buildWorld } from '/static/worldbuilder.js';
+import { WORLDS, getWorld } from './worlds.js';
+import { buildWorld } from './worldbuilder.js';
 
 // ------------------------------------------------------------
 // Global state
