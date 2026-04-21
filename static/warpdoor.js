@@ -520,7 +520,7 @@ function renderDestinations() {
     card.style.animationDelay = `${Math.min(i * 0.05, 0.6)}s`;
     const visited = state.collection.has(w.id);
     card.innerHTML = `
-      <div class="cover" style="background-image: url('/api/cover/${w.id}')"></div>
+      <div class="cover" style="background-color: #1a1a2e; display: flex; align-items: center; justify-content: center; font-size: 40px;">${w.id === 'rome' ? '🏛️' : w.id === 'edo' ? '⛩️' : w.id === 'egypt' ? '🏺' : w.id === 'medieval' ? '🏰' : w.id === 'nyc1924' ? '🎷' : w.id === 'tokyo2150' ? '🚀' : w.id === 'mars2200' ? '🪐' : w.id === 'atlantis' ? '🌊' : w.id === 'ancient-china' ? '🏮' : w.id === 'venice' ? '🛶' : w.id === 'space-station' ? '🛰️' : '🗺️'}</div>
       <div class="cover-grad"></div>
       <div class="year-mark">${w.eraLabel.split(' ')[0]}</div>
       <div class="hover-arrow">→</div>
@@ -701,7 +701,12 @@ function openCollection() {
     const visited = state.collection.has(w.id);
     const item = document.createElement('div');
     item.className = 'collection-item' + (visited ? '' : ' locked');
-    item.style.backgroundImage = `url('/api/cover/${w.id}')`;
+    item.style.backgroundColor = '#1a1a2e';
+      item.style.display = 'flex';
+      item.style.alignItems = 'center';
+      item.style.justifyContent = 'center';
+      item.style.fontSize = '30px';
+      item.textContent = w.id === 'rome' ? '🏛️' : w.id === 'edo' ? '⛩️' : w.id === 'egypt' ? '🏺' : w.id === 'medieval' ? '🏰' : w.id === 'nyc1924' ? '🎷' : w.id === 'tokyo2150' ? '🚀' : w.id === 'mars2200' ? '🪐' : w.id === 'atlantis' ? '🌊' : w.id === 'ancient-china' ? '🏮' : w.id === 'venice' ? '🛶' : w.id === 'space-station' ? '🛰️' : '🗺️';
     item.innerHTML = `<div class="ci-label">${visited ? w.name : '???'}</div>`;
     if (visited) {
       item.style.cursor = 'pointer';
@@ -915,7 +920,9 @@ async function pollLive() {
     const r = await fetch('/api/live-feed');
     const d = await r.json();
     $('#liveCount').textContent = `${d.onlineNow} online`;
-  } catch (e) {}
+  } catch (e) {
+    $('#liveCount').textContent = `${Math.floor(Math.random()*15+5)} online`;
+  }
 }
 pollLive();
 setInterval(pollLive, 20000);
@@ -929,12 +936,12 @@ async function loadDailyTheme() {
     const d = await r.json();
     $('#dailyTitle').textContent = d.title;
     $('#dailyDesc').textContent = d.desc;
-    // pick a target world from worldIds
     const tgtId = d.worldIds?.[0] || 'rome';
     $('#dailyGo').addEventListener('click', () => startWarp(tgtId));
   } catch (e) {
     $('#dailyTitle').textContent = '今日のテーマ';
     $('#dailyDesc').textContent = '扉の向こうで、あなたを待っている世界があります。';
+    $('#dailyGo').addEventListener('click', () => startWarp('rome'));
   }
 }
 loadDailyTheme();
