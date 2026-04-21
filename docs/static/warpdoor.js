@@ -164,6 +164,26 @@ const state = {
   totalWarps: storage.get('totalWarps', 0),
 }
 
+function trackEvent(eventName, params = {}) {
+  if (typeof window === 'undefined' || typeof window.gtag !== 'function') return
+  window.gtag('event', eventName, {
+    app_name: 'WARPDOOR',
+    phase: state.phase,
+    ...params,
+  })
+}
+
+function worldAnalyticsParams(world = state.world) {
+  if (!world) return {}
+  return {
+    world_id: world.id,
+    world_name: world.name,
+    world_year: String(world.year),
+    world_subtitle: world.subtitle,
+    is_locked_world: !!world.locked,
+  }
+}
+
 function incrementStamp(worldId) {
   state.stamps[worldId] = (state.stamps[worldId] || 0) + 1
   state.totalWarps++
@@ -386,6 +406,7 @@ async function fetchDailyTheme() {
 function selectWorld(world) {
   if (world.locked && !state.hasPass) return renderPaywall()
   state.world = world
+  trackEvent('world_selected', worldAnalyticsParams(world))
   renderDoorScene()
 }
 
@@ -624,6 +645,10 @@ function renderDoorScene() {
   const openDoor = () => {
     if (doorOpened) return
     doorOpened = true
+    trackEvent('door_opened', {
+      interaction_type: 'door_open',
+      ...worldAnalyticsParams(world),
+    })
     sound.playDoorOpen()
     prompt.style.opacity = '0'
     prompt.style.transform = 'translateX(-50%) translateY(20px)'
@@ -652,6 +677,11 @@ function renderDoorScene() {
   const startWarp = () => {
     if (warping) return
     warping = true
+    trackEvent('warp_started', {
+      interaction_type: 'warp_execute',
+      total_warps_before: state.totalWarps,
+      ...worldAnalyticsParams(world),
+    })
     renderWarpTransition()
   }
 
@@ -989,6 +1019,12 @@ function renderWorldScene() {
     if (!state.arrivalDone) {
       state.arrivalDone = true
       incrementStamp(world.id)
+      trackEvent('world_arrived', {
+        interaction_type: 'arrival',
+        total_warps_after: state.totalWarps,
+        world_warp_count: state.stamps[world.id] || 0,
+        ...worldAnalyticsParams(world),
+      })
       sound.playArrival()
       sound.startAmbient(world)
       const first = world.discoveries[0]
