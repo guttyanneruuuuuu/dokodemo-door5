@@ -1,52 +1,66 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<meta name="theme-color" content="#000000" />
-<title>WARPDOOR — 扉を開ければ、そこへ</title>
-<meta name="description" content="ブラウザだけで本物のどこでもドア体験。扉を開けば、古代ローマへ、未来の東京へ、火星へ。歩ける・視点を変えられる3D没入型ワープサービス。" />
-<meta property="og:title" content="WARPDOOR — どこでもドア3D体験" />
-<meta property="og:description" content="扉を開ければ、そこは1000年前か1000年後。リアルに歩ける没入型ワープ体験。" />
-<meta property="og:image" content="/api/share-card/rome" />
-<meta property="og:type" content="website" />
-<meta name="twitter:card" content="summary_large_image" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=IBM+Plex+Mono:wght@300;400;500&family=Shippori+Mincho:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="./static/warpdoor.css" />
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚪</text></svg>" />
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-XXXXXXXXXX');
-</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#000005" />
+  <title>WARPDOOR v8 — 扉を開ければ、そこへ</title>
+  <meta name="description" content="ブラウザだけで本物のどこでもドア体験。扉を開けば、古代ローマへ、未来の東京へ、火星へ。歩ける・視点を変えられる3D没入型ワープサービス。" />
+  <meta property="og:title" content="WARPDOOR — どこでもドア3D体験" />
+  <meta property="og:description" content="扉を開ければ、そこは1000年前か1000年後。リアルに歩ける没入型ワープ体験。" />
+  <meta property="og:image" content="/api/share-card/rome" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=IBM+Plex+Mono:wght@400;600&family=Shippori+Mincho:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./static/warpdoor.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚪</text></svg>" />
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
 </head>
 <body>
+
+  <!-- First load veil -->
   <div class="first-load" id="firstLoad">
     <div class="spinner"></div>
-    <div class="label">WARPDOOR · LOADING</div>
+    <div class="label">WARPDOOR</div>
+    <div class="load-sub">INITIALIZING QUANTUM TUNNEL...</div>
   </div>
-  <div id="root"></div>
+
+  <!-- Background 3D canvas -->
   <canvas id="bg-canvas"></canvas>
 
-  <!-- Top HUD -->
+  <!-- ============================================================
+       TOP HUD
+       ============================================================ -->
   <div class="top-hud">
     <div class="brand">
       <div class="brand-mark">🚪</div>
       <div>WARPDOOR</div>
     </div>
     <div class="hud-right">
-      <div class="hud-chip" id="liveChip"><span class="pulse-dot"></span><span id="liveCount">— online</span></div>
-      <div class="hud-chip" id="collectionChip" style="cursor:pointer;">◉ <span id="collectionCount">0</span> / 12</div>
+      <div class="hud-chip" id="liveChip">
+        <span class="pulse-dot"></span>
+        <span id="liveCount">— online</span>
+      </div>
+      <div class="hud-chip" id="collectionChip" style="cursor:pointer;" title="コレクションを見る">
+        🗺 <span id="collectionCount">0</span> / 11
+      </div>
     </div>
   </div>
 
-  <!-- Landing screen -->
+  <!-- ============================================================
+       SCREEN 1 — LANDING
+       ============================================================ -->
   <section class="screen active" id="screen-landing">
     <div class="veil"></div>
     <div class="landing-content">
@@ -59,14 +73,19 @@
       </p>
       <div class="landing-cta">
         <button class="cta-primary" id="openDoor">扉をひらく</button>
-        <div class="cta-hint">TAP / CLICK TO BEGIN</div>
+        <div class="cta-hint">
+          <span class="desktop-only">CLICK TO BEGIN</span>
+          <span class="mobile-only">TAP TO BEGIN</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Destination Picker -->
+  <!-- ============================================================
+       SCREEN 2 — DESTINATION PICKER
+       ============================================================ -->
   <section class="screen" id="screen-picker">
-    <div class="picker-back" id="pickerBack" title="戻る">←</div>
+    <button class="picker-back" id="pickerBack" aria-label="戻る">←</button>
     <div class="picker-wrap">
       <div class="picker-header">
         <div class="picker-kicker">SELECT YOUR DESTINATION</div>
@@ -74,25 +93,32 @@
         <p class="picker-sub">時代を選べば、ドアがそこへ繋がる。歩いて、見て、触れて、また戻ってこよう。</p>
       </div>
 
+      <!-- Daily theme banner -->
       <div class="daily-banner" id="dailyBanner">
         <div class="daily-left">
-          <div class="daily-kicker">TODAY'S JOURNEY</div>
+          <div class="daily-kicker">TODAY'S JOURNEY · 今日のテーマ</div>
           <div class="daily-title" id="dailyTitle">今日のテーマ</div>
           <div class="daily-desc" id="dailyDesc">毎日異なるテーマがあなたを迎えます。</div>
         </div>
-        <button class="daily-go" id="dailyGo">→ ワープ</button>
+        <button class="daily-go" id="dailyGo">今すぐ行く →</button>
       </div>
 
+      <!-- Quick actions -->
       <div class="quick-actions">
         <button class="quick-btn" id="randomWarp">🎲 ランダムでワープ</button>
       </div>
 
+      <!-- Filter bar -->
       <div class="filter-bar" id="filterBar"></div>
+
+      <!-- Destination grid -->
       <div class="dest-grid" id="destGrid"></div>
     </div>
   </section>
 
-  <!-- Transition -->
+  <!-- ============================================================
+       SCREEN 3 — TRANSITION
+       ============================================================ -->
   <section class="screen" id="screen-transition">
     <div class="transition-status">
       <div class="transition-title" id="transitionTitle">接続しています...</div>
@@ -101,76 +127,86 @@
     </div>
   </section>
 
-  <!-- World UI -->
+  <!-- ============================================================
+       SCREEN 4 — WORLD UI
+       ============================================================ -->
   <section class="screen" id="screen-world">
     <div class="world-ui">
+      <!-- World info -->
       <div class="world-info">
         <div class="world-era" id="worldEra">—</div>
         <div class="world-name" id="worldName">—</div>
       </div>
 
+      <!-- Top-right action buttons -->
       <div class="world-actions">
-        <button class="wa-btn" id="btnShare" title="シェア">⇪</button>
-        <button class="wa-btn" id="btnPhoto" title="スナップショット">◎</button>
-        <button class="wa-btn leave" id="btnLeave" title="扉に戻る">⤺</button>
+        <button class="wa-btn" id="btnPhoto" title="スクリーンショット">📸</button>
+        <button class="wa-btn" id="btnShare" title="シェア">🔗</button>
+        <button class="wa-btn leave" id="btnLeave" title="扉に戻る">✕</button>
       </div>
 
+      <!-- Controls hint -->
       <div class="controls-hint" id="controlsHint">
-        <span class="desktop-only"><span class="kbd">W</span><span class="kbd">A</span><span class="kbd">S</span><span class="kbd">D</span> 移動</span>
-        <span class="desktop-only">マウスで視点</span>
-        <span class="desktop-only"><span class="kbd">SPACE</span> ジャンプ</span>
-        <span class="mobile-only">ジョイスティックで移動 · スワイプで視点</span>
+        <span class="desktop-only">
+          <span class="kbd">W</span><span class="kbd">A</span><span class="kbd">S</span><span class="kbd">D</span> 移動
+          &nbsp;
+          <span class="kbd">マウス</span> 視点
+          &nbsp;
+          <span class="kbd">Space</span> ジャンプ
+          &nbsp;
+          <span class="kbd">Shift</span> ダッシュ
+          &nbsp;
+          <span class="kbd">V</span> 視点切替
+        </span>
+        <span class="mobile-only">
+          左スティック: 移動 &nbsp;|&nbsp; 右スワイプ: 視点 &nbsp;|&nbsp; ジャンプボタン: ジャンプ
+        </span>
       </div>
 
-      <!-- mobile joystick -->
-      <div class="joystick" id="joystick">
-        <div class="base"></div>
-        <div class="knob" id="knob"></div>
-      </div>
+      <!-- Coordinate HUD -->
+      <div class="coord-hud" id="coordHud">— —</div>
 
-      <!-- jump btn mobile -->
-      <button class="jump-btn" id="jumpBtn">JUMP</button>
-
-      <!-- view toggle -->
+      <!-- View toggle -->
       <div class="view-toggle" id="viewToggle">
         <button id="viewToggleBtn" title="視点切替">👁</button>
       </div>
-
-      <!-- coordinates -->
-      <div class="coord-hud" id="coordHud">— —</div>
     </div>
+
+    <!-- Mobile joystick -->
+    <div class="joystick" id="joystick">
+      <div class="base"></div>
+      <div class="knob" id="knob"></div>
+    </div>
+
+    <!-- Mobile jump button -->
+    <button class="jump-btn" id="jumpBtn">JUMP</button>
   </section>
 
-  <!-- Modal: collection -->
+  <!-- ============================================================
+       COLLECTION MODAL
+       ============================================================ -->
   <div class="modal" id="collectionModal">
     <div class="modal-box">
       <button class="modal-close" id="modalClose">✕</button>
       <div class="modal-title">あなたの旅の記憶</div>
-      <div class="modal-sub">訪れた世界はここに蓄積されます。全12世界を制覇しよう。</div>
+      <div class="modal-sub">訪れた世界はここに蓄積されます。全11世界を制覇しよう。</div>
       <div class="collection-grid" id="collectionGrid"></div>
     </div>
   </div>
 
-  <!-- Toast -->
+  <!-- Toast notification -->
   <div class="toast" id="toast"></div>
 
+  <!-- Three.js importmap + main script -->
   <script type="importmap">
   {
     "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
     }
   }
   </script>
   <script type="module" src="./static/warpdoor.js"></script>
 
-  <style>
-    .desktop-only { display: inline-flex; align-items: center; gap: 4px; }
-    .mobile-only { display: none; }
-    @media (pointer: coarse) {
-      .desktop-only { display: none; }
-      .mobile-only { display: inline; }
-    }
-  </style>
 </body>
 </html>
