@@ -1402,14 +1402,14 @@ function buildNeoTokyo(api) {
     root.add(mark);
   }
 
-  // Cyber towers — more
+  // Cyber towers — close to spawn so they are immediately visible
   for (let i=0;i<14;i++){
-    const z = -8 - i*22;
+    const z = -4 - i*20;
     const h = 22 + Math.random()*28;
     const w = 8 + Math.random()*6;
     const d = 8 + Math.random()*6;
-    cyberTower(THREE, root, -20 - Math.random()*8, z, w, d, h, neonColors, collidables, dynamicTickers);
-    cyberTower(THREE, root,  20 + Math.random()*8, z, w, d, h, neonColors, collidables, dynamicTickers);
+    cyberTower(THREE, root, -14 - Math.random()*6, z, w, d, h, neonColors, collidables, dynamicTickers);
+    cyberTower(THREE, root,  14 + Math.random()*6, z, w, d, h, neonColors, collidables, dynamicTickers);
   }
 
   // Flying cars — more
