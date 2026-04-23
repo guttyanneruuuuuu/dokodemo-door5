@@ -538,8 +538,8 @@ function buildRome(api) {
     cypress(THREE, root, x, z, capMat, collidables, rand);
   }
 
-  // Distant mountains
-  addDistantMountains(THREE, root, 0x8a6a4a, 220, 20);
+  // Distant mountains — olive hills of Italy
+  addDistantMountains(THREE, root, 0x6a8a5a, 220, 20);
 
   // Birds
   addFlock(THREE, root, dynamicTickers, 0x2a1810, 10, 140);
@@ -552,7 +552,8 @@ function buildRome(api) {
   warmLight2.position.set(0, 3, -22);
   root.add(warmLight2);
 
-  return { spawn: new THREE.Vector3(0, 0, 0), spawnYaw: Math.PI };
+  // Spawn in front of the forum, facing the temple
+  return { spawn: new THREE.Vector3(0, 0, 12), spawnYaw: Math.PI };
 }
 
 function cypress(THREE, root, x, z, trunkMat, collidables, rand) {
