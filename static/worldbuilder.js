@@ -1249,7 +1249,7 @@ function buildNYC(api) {
       new THREE.MeshStandardMaterial({ color: 0xeee0a8, roughness: 1 })
     );
     mark.rotation.x = -Math.PI/2;
-    mark.position.set(0, 0.02, -150 + i*4.5);
+    mark.position.set(0, 0.02, -5 + i*4.5);
     root.add(mark);
   }
 
@@ -1286,7 +1286,7 @@ function buildNYC(api) {
   }
 
   for (let i=0;i<12;i++){
-    const z = -15 - i*22;
+    const z = -5 - i*22;
     const shade = 0x282018 + Math.floor(Math.random()*0x202020);
     skyscraper(-20, z, 12+Math.random()*5, 14+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
     skyscraper( 20, z, 12+Math.random()*5, 14+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
