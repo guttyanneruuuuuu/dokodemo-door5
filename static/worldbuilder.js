@@ -393,7 +393,7 @@ function buildRome(api) {
     const x = Math.cos(angle)*dist;
     const z = Math.sin(angle)*dist;
     if (Math.abs(x) < 10 && z > -90 && z < 40) continue;
-    cypress(THREE, root, x, z, capMat, collidables);
+    cypress(THREE, root, x, z, capMat, collidables, i < 18 ? dynamicTickers : null);
   }
 
   // Distant mountains
@@ -402,11 +402,21 @@ function buildRome(api) {
   // Some birds
   addFlock(THREE, root, dynamicTickers, 0x2a1810, 6, 120);
 
+  // Mediterranean sun disc
+  const romanSun = makeSunSprite(THREE, 0xffd88a, 24);
+  romanSun.position.set(80, 80, -120);
+  root.add(romanSun);
+
+  // Cumulus clouds drifting overhead
+  const romanClouds = makeClouds(THREE, 16, 320, 84, 0.62);
+  root.add(romanClouds);
+  dynamicTickers.push((t) => { romanClouds.position.x = Math.sin(t * 0.028) * 12; });
+
   const spawn = new THREE.Vector3(0, 0, 0);
   return { spawn, spawnYaw: Math.PI };
 }
 
-function cypress(THREE, root, x, z, trunkMat, collidables) {
+function cypress(THREE, root, x, z, trunkMat, collidables, tickers) {
   const g = new THREE.Group();
   const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 1, 8), new THREE.MeshStandardMaterial({ color: 0x4a2a18, roughness: 1 }));
   trunk.position.y = 0.5;
@@ -418,6 +428,13 @@ function cypress(THREE, root, x, z, trunkMat, collidables) {
   g.position.set(x, 0, z);
   root.add(g);
   collidables.push({ x, z, r: 0.5 });
+  if (tickers) {
+    const phase = Math.random() * Math.PI * 2;
+    tickers.push((t) => {
+      g.rotation.z = Math.sin(t * 0.65 + phase) * 0.022;
+      g.rotation.x = Math.cos(t * 0.45 + phase) * 0.014;
+    });
+  }
 }
 
 function addDistantMountains(THREE, root, color, dist=200, count=16) {
@@ -454,6 +471,37 @@ function addFlock(THREE, root, tickers, color, count=6, radius=80) {
       b.rotation.y = Math.PI/2;
     });
   });
+}
+
+// Volumetric cloud sprites — used by multiple biomes
+function makeClouds(THREE, count=18, spread=300, height=80, opacity=0.75, tint=[255,255,255]) {
+  const g = new THREE.Group();
+  const [cr, cg, cb] = tint;
+  for (let i=0;i<count;i++){
+    const c = document.createElement('canvas'); c.width=256; c.height=128;
+    const ctx = c.getContext('2d');
+    // base oval
+    const grd = ctx.createRadialGradient(128,64,8,128,64,128);
+    grd.addColorStop(0, `rgba(${cr},${cg},${cb},${opacity.toFixed(2)})`);
+    grd.addColorStop(0.5, `rgba(${cr},${cg},${cb},${(opacity*0.38).toFixed(2)})`);
+    grd.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
+    ctx.fillStyle = grd;
+    ctx.beginPath(); ctx.ellipse(128,64,120,55,0,0,Math.PI*2); ctx.fill();
+    // extra puffs for volume
+    for (let p=0;p<5;p++){
+      const px=35+Math.random()*185, py=18+Math.random()*55, pr=18+Math.random()*28;
+      const sg = ctx.createRadialGradient(px,py,0,px,py,pr);
+      sg.addColorStop(0, `rgba(${cr},${cg},${cb},${(opacity*0.55).toFixed(2)})`);
+      sg.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
+      ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(px,py,pr,0,Math.PI*2); ctx.fill();
+    }
+    const tex = new THREE.CanvasTexture(c);
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map:tex, transparent:true, depthWrite:false }));
+    sp.position.set((Math.random()-0.5)*spread, height+(Math.random()-0.5)*28, (Math.random()-0.5)*spread);
+    sp.scale.set(110+Math.random()*110, 32+Math.random()*28, 1);
+    g.add(sp);
+  }
+  return g;
 }
 
 // ============================================================
@@ -510,11 +558,12 @@ function buildEdo(api) {
   for (let i=0;i<16;i++){
     const z = -15 - i*8 + Math.random()*3;
     const x = (Math.random()>0.5 ? -15 : 15) + (Math.random()-0.5)*2;
-    sakuraTree(THREE, root, x, z, collidables);
+    sakuraTree(THREE, root, x, z, collidables, dynamicTickers);
   }
 
-  // Falling petals
-  const petals = makeFallingParticles(THREE, 0xffd0e0, 600, 40);
+  // Falling petals — denser and larger for full immersion
+  const petals = makeFallingParticles(THREE, 0xffd0e0, 1400, 45);
+  petals.material.size = 0.22;
   root.add(petals);
   dynamicTickers.push((t, dt) => updateFallingParticles(petals, dt));
 
@@ -527,6 +576,18 @@ function buildEdo(api) {
 
   // Distant mountains
   addDistantMountains(THREE, root, 0x3a2a4a, 180, 18);
+
+  // Twilight clouds
+  const edoClouds = makeClouds(THREE, 14, 260, 74, 0.5);
+  root.add(edoClouds);
+  dynamicTickers.push((t) => { edoClouds.position.x = Math.sin(t * 0.022) * 10; });
+
+  // Low ground mist wisps near the street
+  const mistA = makeFogParticles(THREE, 0xffe8cc, 1);
+  mistA.scale.setScalar(0.35);
+  mistA.position.y = 0.4;
+  root.add(mistA);
+  dynamicTickers.push((t) => { mistA.rotation.y = t * 0.015; });
 
   return { spawn: new THREE.Vector3(0, 0, 4), spawnYaw: 0 };
 }
@@ -598,7 +659,7 @@ function pagoda(THREE, root, x, z, collidables) {
   root.add(g);
   collidables.push({ x, z, r: 5 });
 }
-function sakuraTree(THREE, root, x, z, collidables) {
+function sakuraTree(THREE, root, x, z, collidables, tickers) {
   const g = new THREE.Group();
   const trunk = new THREE.Mesh(
     new THREE.CylinderGeometry(0.2, 0.35, 3, 8),
@@ -618,6 +679,13 @@ function sakuraTree(THREE, root, x, z, collidables) {
   g.position.set(x, 0, z);
   root.add(g);
   collidables.push({ x, z, r: 0.4 });
+  if (tickers) {
+    const phase = Math.random() * Math.PI * 2;
+    tickers.push((t) => {
+      g.rotation.z = Math.sin(t * 0.8 + phase) * 0.028;
+      g.rotation.x = Math.cos(t * 0.55 + phase) * 0.018;
+    });
+  }
 }
 function stoneLantern(THREE, root, x, z, collidables) {
   const g = new THREE.Group();
@@ -747,17 +815,22 @@ function buildEgypt(api) {
   const lintel = meshBox(THREE, 18, 1.5, 3, 0, 10, 20, obeliskMat);
   root.add(lintel);
 
-  // Sun high
-  const sunSprite = makeSunSprite(THREE, 0xffd88a, 25);
+  // Sun high — blazing Egyptian sun
+  const sunSprite = makeSunSprite(THREE, 0xffe090, 38);
   sunSprite.position.set(120, 120, -60);
   root.add(sunSprite);
 
-  // Sandstorm haze (dust particles)
-  const dust = makeFallingParticles(THREE, 0xffd8a0, 150, 60);
-  dust.material.size = 0.08;
-  dust.material.opacity = 0.4;
+  // Sandstorm haze (dense dust particles)
+  const dust = makeFallingParticles(THREE, 0xffd8a0, 500, 80);
+  dust.material.size = 0.07;
+  dust.material.opacity = 0.55;
   root.add(dust);
-  dynamicTickers.push((t, dt) => updateFallingParticles(dust, dt*0.4));
+  dynamicTickers.push((t, dt) => updateFallingParticles(dust, dt*0.5));
+
+  // Sparse high-altitude wispy clouds
+  const desertClouds = makeClouds(THREE, 8, 420, 105, 0.32);
+  root.add(desertClouds);
+  dynamicTickers.push((t) => { desertClouds.position.x = Math.sin(t * 0.018) * 14; });
 
   return { spawn: new THREE.Vector3(0, 0, 8), spawnYaw: Math.PI };
 }
@@ -816,13 +889,18 @@ function buildMedieval(api) {
     const z = (Math.random()-0.5)*260;
     if (Math.abs(x) < 10 && z > -95 && z < 10) continue;
     if (Math.hypot(x, z+120) < 30) continue;
-    pineTree(THREE, root, x, z, collidables);
+    pineTree(THREE, root, x, z, collidables, i < 22 ? dynamicTickers : null);
   }
 
-  // Mist
+  // Mist layers — thicker and more atmospheric
   const mist = makeFogParticles(THREE, 0xc0c8d8, 80);
   root.add(mist);
   dynamicTickers.push((t)=>{ mist.rotation.y = t*0.02; });
+  const mist2 = makeFogParticles(THREE, 0xa8b0c0, 60);
+  mist2.scale.setScalar(0.7);
+  mist2.position.y = 0.5;
+  root.add(mist2);
+  dynamicTickers.push((t)=>{ mist2.rotation.y = -t*0.015; });
 
   // Torches flickering light
   for (let i=0;i<4;i++){
@@ -832,9 +910,22 @@ function buildMedieval(api) {
     torch.userData.base = torch.intensity;
     root.add(torch);
     dynamicTickers.push((t) => {
-      torch.intensity = torch.userData.base * (0.85 + Math.sin(t*7 + i)*0.12);
+      torch.intensity = torch.userData.base * (0.85 + Math.sin(t*7 + i)*0.12 + Math.sin(t*13 + i*2.3)*0.05);
     });
   }
+
+  // Dark storm clouds rolling overhead
+  const stormClouds = makeClouds(THREE, 28, 360, 68, 0.9, [88, 95, 110]);
+  root.add(stormClouds);
+  dynamicTickers.push((t) => {
+    stormClouds.position.x = Math.sin(t * 0.024) * 20;
+    stormClouds.position.z = Math.cos(t * 0.016) * 14;
+  });
+
+  // Medieval sun — dim behind clouds
+  const medievalSun = makeSunSprite(THREE, 0xe0d8b0, 14);
+  medievalSun.position.set(40, 55, -80);
+  root.add(medievalSun);
 
   return { spawn: new THREE.Vector3(0, 0, 10), spawnYaw: Math.PI };
 }
