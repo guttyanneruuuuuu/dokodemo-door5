@@ -552,8 +552,8 @@ function buildRome(api) {
   warmLight2.position.set(0, 3, -22);
   root.add(warmLight2);
 
-  // Spawn in front of the forum, facing the temple
-  return { spawn: new THREE.Vector3(0, 0, 12), spawnYaw: Math.PI };
+  // Spawn in the forum plaza, facing the temple
+  return { spawn: new THREE.Vector3(0, 0, 18), spawnYaw: Math.PI };
 }
 
 function cypress(THREE, root, x, z, trunkMat, collidables, rand) {

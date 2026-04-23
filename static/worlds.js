@@ -20,7 +20,7 @@ export const WORLDS = [
     cover: 'rome',
     palette: {
       sky: [0x5a9fd4, 0xd4e8f8, 0x1a5a9a],  // mediterranean blue sky
-      fog: 0xd8e8f0, fogNear: 80, fogFar: 500,
+      fog: 0xc8ddf0, fogNear: 100, fogFar: 600,
       ground: 0xd8cdb4,
       ambient: 0xfff0e0, ambientI: 0.65,
       sun: 0xfff0c8, sunI: 1.4,
