@@ -684,7 +684,7 @@ function buildEdo(api) {
   moon.position.set(-80, 100, -80);
   root.add(moon);
 
-  return { spawn: new THREE.Vector3(0, 0, 4), spawnYaw: 0 };
+  return { spawn: new THREE.Vector3(0, 0, 15), spawnYaw: Math.PI };
 }
 
 function edoHouse(THREE, root, x, z, rotY, collidables, dynamicTickers) {
@@ -1700,7 +1700,7 @@ function buildMars(api) {
   lander.position.set(16, 0, 16); root.add(lander);
   collidables.push({ x:16, z:16, r:2.4 });
 
-  return { spawn: new THREE.Vector3(0, 0, 0), spawnYaw: Math.PI };
+  return { spawn: new THREE.Vector3(0, 0, 15), spawnYaw: Math.PI };
 }
 
 // ============================================================
@@ -1828,7 +1828,7 @@ function buildAtlantis(api) {
     });
   }
 
-  return { spawn: new THREE.Vector3(0, 0, 5), spawnYaw: Math.PI };
+  return { spawn: new THREE.Vector3(0, 0, 20), spawnYaw: Math.PI };
 }
 
 // ============================================================
@@ -1877,7 +1877,7 @@ function buildChangAn(api) {
 
   // Buildings lining the avenue
   for (let i=0;i<8;i++){
-    const z = -15 - i*14;
+    const z = -5 - i*14;
     tangBuilding(THREE, root, -16, z, Math.PI/2, collidables, dynamicTickers);
     tangBuilding(THREE, root,  16, z, -Math.PI/2, collidables, dynamicTickers);
   }
@@ -1917,7 +1917,7 @@ function buildChangAn(api) {
   // Distant mountains
   addDistantMountains(THREE, root, 0x5a3a28, 240, 18);
 
-  return { spawn: new THREE.Vector3(0, 0, 5), spawnYaw: Math.PI };
+  return { spawn: new THREE.Vector3(0, 0, 15), spawnYaw: Math.PI };
 }
 
 function tangBuilding(THREE, root, x, z, rotY, collidables, dynamicTickers) {
@@ -1990,7 +1990,7 @@ function buildVenice(api) {
 
   // Venetian buildings
   for (let i=0;i<10;i++){
-    const z = -15 - i*16;
+    const z = -5 - i*16;
     venetianBuilding(THREE, root, -14, z, Math.PI/2, collidables);
     venetianBuilding(THREE, root,  14, z, -Math.PI/2, collidables);
   }
@@ -2033,7 +2033,7 @@ function buildVenice(api) {
   // Distant mountains
   addDistantMountains(THREE, root, 0x8a8a9a, 220, 16);
 
-  return { spawn: new THREE.Vector3(0, 0, 5), spawnYaw: Math.PI };
+  return { spawn: new THREE.Vector3(0, 0, 15), spawnYaw: Math.PI };
 }
 
 function venetianBuilding(THREE, root, x, z, rotY, collidables) {
@@ -2255,5 +2255,5 @@ function buildSpaceStation(api) {
   earthLight.position.set(0, -80, 0);
   root.add(earthLight);
 
-  return { spawn: new THREE.Vector3(0, 0, 5), spawnYaw: Math.PI };
+  return { spawn: new THREE.Vector3(0, 0, 15), spawnYaw: Math.PI };
 }
