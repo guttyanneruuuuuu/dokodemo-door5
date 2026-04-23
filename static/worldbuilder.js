@@ -1398,13 +1398,13 @@ function buildNeoTokyo(api) {
       new THREE.MeshBasicMaterial({ color: neonColors[i%neonColors.length], transparent: true, opacity: 0.7 })
     );
     mark.rotation.x = -Math.PI/2;
-    mark.position.set((i%2===0 ? -4 : 4), 0.02, -150 + i*4.5);
+    mark.position.set((i%2===0 ? -4 : 4), 0.02, -5 + i*4.5);
     root.add(mark);
   }
 
   // Cyber towers — more
   for (let i=0;i<14;i++){
-    const z = -20 - i*25;
+    const z = -8 - i*22;
     const h = 22 + Math.random()*28;
     const w = 8 + Math.random()*6;
     const d = 8 + Math.random()*6;
