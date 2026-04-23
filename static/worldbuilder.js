@@ -397,8 +397,8 @@ function buildRome(api) {
   const { THREE, world, root, collidables, dynamicTickers } = api;
   const rand = seededRand(12345);
 
-  // Ground — marble plaza with detail
-  addGroundLayered(THREE, root, 0xc9a674, 0xdccaa8, 500);
+  // Ground — marble plaza with detail (white-grey marble)
+  addGroundLayered(THREE, root, 0xd8cdb4, 0xf0ece0, 500);
 
   // Large plaza
   const plaza = new THREE.Mesh(

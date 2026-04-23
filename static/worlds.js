@@ -19,13 +19,13 @@ export const WORLDS = [
     tags: ['古代', '歴史', 'ヨーロッパ'],
     cover: 'rome',
     palette: {
-      sky: [0xfab062, 0xffe7c2, 0x7baee6],  // sunset warm
-      fog: 0xf8c58c, fogNear: 60, fogFar: 420,
-      ground: 0xc9a674,
-      ambient: 0xffe6c6, ambientI: 0.55,
-      sun: 0xffcf8e, sunI: 1.2,
-      sunPos: [80, 40, 60],
-      timeOfDay: 'golden',
+      sky: [0x5a9fd4, 0xd4e8f8, 0x1a5a9a],  // mediterranean blue sky
+      fog: 0xd8e8f0, fogNear: 80, fogFar: 500,
+      ground: 0xd8cdb4,
+      ambient: 0xfff0e0, ambientI: 0.65,
+      sun: 0xfff0c8, sunI: 1.4,
+      sunPos: [80, 55, 60],
+      timeOfDay: 'day',
     },
     biome: 'mediterranean',  // cypress, stone plaza
     architecture: 'roman',   // columns, domes, arches

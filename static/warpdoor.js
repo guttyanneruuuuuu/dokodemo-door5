@@ -568,7 +568,7 @@ $('#pickerBack').addEventListener('click', () => showScreen('screen-landing'));
 
 // World color palettes for card backgrounds
 const WORLD_CARD_COLORS = {
-  'rome':          ['#c9a674', '#7baee6', '#fab062'],
+  'rome':          ['#d8cdb4', '#5a9fd4', '#f0ece0'],
   'edo':           ['#6e5541', '#39456e', '#ff9970'],
   'egypt':         ['#e0b875', '#87a6d0', '#ffcf7a'],
   'medieval':      ['#5a6b4a', '#3a4255', '#6b7d9a'],
