@@ -399,6 +399,12 @@ function buildRome(api) {
   // Distant mountains
   addDistantMountains(THREE, root, 0x8a6a4a, 200, 18);
 
+  // Clouds in the golden sky
+  addAnimatedClouds(THREE, root, dynamicTickers, 0xffeedd, 140, 0.45);
+
+  // Sun god rays from above
+  addGodRays(THREE, root, dynamicTickers, new THREE.Vector3(80, 90, 60), 0xfff0d0, 7, 110);
+
   // Some birds
   addFlock(THREE, root, dynamicTickers, 0x2a1810, 6, 120);
 
@@ -513,10 +519,16 @@ function buildEdo(api) {
     sakuraTree(THREE, root, x, z, collidables);
   }
 
-  // Falling petals
-  const petals = makeFallingParticles(THREE, 0xffd0e0, 600, 40);
+  // Falling petals — doubled density for more drama
+  const petals = makeFallingParticles(THREE, 0xffc2d8, 1200, 50);
   root.add(petals);
   dynamicTickers.push((t, dt) => updateFallingParticles(petals, dt));
+
+  // Extra pink petals layer (slightly different shade)
+  const petals2 = makeFallingParticles(THREE, 0xffaac8, 800, 40);
+  petals2.material.size = 0.12;
+  root.add(petals2);
+  dynamicTickers.push((t, dt) => updateFallingParticles(petals2, dt * 0.7));
 
   // Stone lanterns
   for (let i=0;i<6;i++){
@@ -527,6 +539,15 @@ function buildEdo(api) {
 
   // Distant mountains
   addDistantMountains(THREE, root, 0x3a2a4a, 180, 18);
+
+  // Fireflies at dusk
+  addFireflies(THREE, root, dynamicTickers, 45, 28, 4, 0xaaff60);
+
+  // Sky lanterns floating upward
+  addSkyLanterns(THREE, root, dynamicTickers, 12, 0xff5010);
+
+  // Warm dusk clouds
+  addAnimatedClouds(THREE, root, dynamicTickers, 0xffbbaa, 130, 0.35);
 
   return { spawn: new THREE.Vector3(0, 0, 4), spawnYaw: 0 };
 }
@@ -752,12 +773,37 @@ function buildEgypt(api) {
   sunSprite.position.set(120, 120, -60);
   root.add(sunSprite);
 
-  // Sandstorm haze (dust particles)
-  const dust = makeFallingParticles(THREE, 0xffd8a0, 150, 60);
-  dust.material.size = 0.08;
-  dust.material.opacity = 0.4;
+  // God rays from the blazing sun
+  addGodRays(THREE, root, dynamicTickers, new THREE.Vector3(120, 110, -60), 0xfff2c0, 8, 130);
+
+  // Sandstorm haze (dust particles) — dense and dramatic
+  const dust = makeFallingParticles(THREE, 0xffd8a0, 350, 80);
+  dust.material.size = 0.10;
+  dust.material.opacity = 0.5;
   root.add(dust);
-  dynamicTickers.push((t, dt) => updateFallingParticles(dust, dt*0.4));
+  dynamicTickers.push((t, dt) => updateFallingParticles(dust, dt*0.6));
+
+  // A second heavier sand layer near ground
+  const sandDrift = makeFallingParticles(THREE, 0xe8c070, 200, 100);
+  sandDrift.material.size = 0.06;
+  sandDrift.material.opacity = 0.35;
+  root.add(sandDrift);
+  dynamicTickers.push((t, dt) => {
+    const pos = sandDrift.geometry.attributes.position;
+    const vel = sandDrift.geometry.userData.vel;
+    const sp = sandDrift.geometry.userData.spread;
+    for (let i=0;i<pos.count;i++){
+      pos.array[i*3]   += vel[i*3]*dt*2 + 0.5*dt; // wind direction
+      pos.array[i*3+1] += vel[i*3+1]*dt*0.3;
+      pos.array[i*3+2] += vel[i*3+2]*dt;
+      if (pos.array[i*3+1] < -1 || pos.array[i*3] > sp) {
+        pos.array[i*3]   = -sp;
+        pos.array[i*3+1] = 0.5 + Math.random()*6;
+        pos.array[i*3+2] = (Math.random()-0.5)*sp*2;
+      }
+    }
+    pos.needsUpdate = true;
+  });
 
   return { spawn: new THREE.Vector3(0, 0, 8), spawnYaw: Math.PI };
 }
@@ -823,6 +869,15 @@ function buildMedieval(api) {
   const mist = makeFogParticles(THREE, 0xc0c8d8, 80);
   root.add(mist);
   dynamicTickers.push((t)=>{ mist.rotation.y = t*0.02; });
+
+  // Snowfall for atmospheric bleakness
+  addSnowfall(THREE, root, dynamicTickers, 700, 70);
+
+  // Overcast clouds
+  addAnimatedClouds(THREE, root, dynamicTickers, 0xccd4e0, 100, 0.6);
+
+  // Fireflies near the forest edge
+  addFireflies(THREE, root, dynamicTickers, 20, 40, 3, 0xffdd80);
 
   // Torches flickering light
   for (let i=0;i<4;i++){
@@ -1000,6 +1055,22 @@ function buildNYC(api) {
     streetLamp(THREE, root,  10, z, dynamicTickers);
   }
 
+  // Industrial smog — overcast clouds with grey tones
+  addAnimatedClouds(THREE, root, dynamicTickers, 0xaaa898, 80, 0.55);
+
+  // Low-level smog layer near rooftops
+  const smog = makeFallingParticles(THREE, 0x9a9a8a, 200, 80);
+  smog.material.size = 0.5; smog.material.opacity = 0.12;
+  root.add(smog);
+  dynamicTickers.push((t, dt) => {
+    const pos = smog.geometry.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      pos.array[i*3] += 0.3 * dt; // wind direction
+      if (pos.array[i*3] > 80) pos.array[i*3] = -80;
+    }
+    pos.needsUpdate = true;
+  });
+
   return { spawn: new THREE.Vector3(0, 0, 0), spawnYaw: Math.PI };
 }
 function addBuildingWindows(THREE, group, w, d, baseY, h, mat) {
@@ -1078,12 +1149,36 @@ function buildNeoTokyo(api) {
   street.rotation.x = -Math.PI/2; street.position.y = 0.01; street.receiveShadow = true;
   root.add(street);
 
-  // Rain (falling particles)
-  const rain = makeFallingParticles(THREE, 0x88aadd, 1200, 50);
-  rain.material.size = 0.08;
-  rain.material.opacity = 0.5;
+  // Reflective puddle layer — mirror-like wet sheen
+  const puddleMat = new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false,
+    uniforms: { uTime: { value: 0 } },
+    vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
+    fragmentShader: `
+      varying vec2 vUv; uniform float uTime;
+      float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+      float noise(vec2 p){ vec2 i=floor(p),f=fract(p); float a=hash(i),b=hash(i+vec2(1,0)),c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1)); vec2 u=f*f*(3.-2.*f); return mix(mix(a,b,u.x),mix(c,d,u.x),u.y); }
+      void main(){
+        vec2 p = vUv * 20.0 + vec2(uTime*0.05, 0.0);
+        float ripple = sin(noise(p)*6.28 + uTime*2.0) * 0.5 + 0.5;
+        float puddle = smoothstep(0.55, 0.75, noise(vUv*8.0));
+        vec3 neonA = vec3(1.0, 0.18, 0.55);
+        vec3 neonB = vec3(0.18, 0.91, 1.0);
+        vec3 col = mix(neonA, neonB, sin(uTime*0.3 + vUv.x*3.0)*0.5+0.5) * ripple;
+        gl_FragColor = vec4(col, puddle * 0.35);
+      }
+    `,
+  });
+  const puddle = new THREE.Mesh(new THREE.PlaneGeometry(18, 400), puddleMat);
+  puddle.rotation.x = -Math.PI/2; puddle.position.y = 0.02;
+  root.add(puddle);
+
+  // Rain — dramatically dense (3x original)
+  const rain = makeFallingParticles(THREE, 0x88aadd, 3600, 55);
+  rain.material.size = 0.07;
+  rain.material.opacity = 0.55;
   root.add(rain);
-  dynamicTickers.push((t, dt) => updateFallingParticles(rain, dt*3));
+  dynamicTickers.push((t, dt) => updateFallingParticles(rain, dt*3.5));
 
   // Cyberpunk towers with neon signs
   const neonColors = [0xff2e8a, 0x2ee8ff, 0xc974ff, 0xffdd00, 0xa8ff40, 0xff8030];
@@ -1138,6 +1233,22 @@ function buildNeoTokyo(api) {
   const moon = makeSunSprite(THREE, 0xffc5ff, 18);
   moon.position.set(80, 90, -100);
   root.add(moon);
+
+  // Puddle ripple animation
+  dynamicTickers.push((t) => { puddleMat.uniforms.uTime.value = t; });
+
+  // Random lightning flashes
+  const flashLight = new THREE.PointLight(0xffffff, 0, 500);
+  flashLight.position.set(0, 50, -100);
+  root.add(flashLight);
+  let nextFlash = 8 + Math.random() * 12;
+  dynamicTickers.push((t) => {
+    if (t > nextFlash) {
+      flashLight.intensity = 5 + Math.random() * 8;
+      setTimeout(() => { flashLight.intensity = 0; }, 80 + Math.random() * 100);
+      nextFlash = t + 6 + Math.random() * 14;
+    }
+  });
 
   return { spawn: new THREE.Vector3(0, 0, 5), spawnYaw: Math.PI };
 }
@@ -1299,11 +1410,32 @@ function buildMars(api) {
   moonB.position.set(-70, 110, 30);
   root.add(moonB);
 
-  // Dust particles
-  const dust = makeFallingParticles(THREE, 0xcc8040, 200, 80);
-  dust.material.size = 0.07; dust.material.opacity = 0.5;
+  // Dust particles — strong directional wind
+  const dust = makeFallingParticles(THREE, 0xcc8040, 350, 90);
+  dust.material.size = 0.08; dust.material.opacity = 0.55;
   root.add(dust);
-  dynamicTickers.push((t, dt) => updateFallingParticles(dust, dt*0.2));
+  dynamicTickers.push((t, dt) => {
+    const pos = dust.geometry.attributes.position;
+    const vel = dust.geometry.userData.vel;
+    const sp = dust.geometry.userData.spread;
+    for (let i=0;i<pos.count;i++){
+      pos.array[i*3]   += vel[i*3]*dt + 0.8*dt; // horizontal wind
+      pos.array[i*3+1] += vel[i*3+1]*dt*0.2;
+      pos.array[i*3+2] += vel[i*3+2]*dt*0.5;
+      if (pos.array[i*3] > sp) {
+        pos.array[i*3]   = -sp;
+        pos.array[i*3+1] = Math.random()*25;
+        pos.array[i*3+2] = (Math.random()-0.5)*sp*2;
+      }
+      if (pos.array[i*3+1] < 0) {
+        pos.array[i*3+1] = 20 + Math.random()*10;
+      }
+    }
+    pos.needsUpdate = true;
+  });
+
+  // Thin Martian atmosphere haze (stratified dust clouds)
+  addAnimatedClouds(THREE, root, dynamicTickers, 0xc86030, 90, 0.3);
 
   // Lander
   const lander = new THREE.Group();
@@ -1393,9 +1525,19 @@ function buildAtlantis(api) {
   }
 
   // Bubbles rising
-  const bubbles = makeRisingParticles(THREE, 0xc0f0ff, 300, 60);
+  const bubbles = makeRisingParticles(THREE, 0xc0f0ff, 500, 70);
   root.add(bubbles);
   dynamicTickers.push((t,dt) => updateRisingParticles(bubbles, dt));
+
+  // Extra fine micro-bubbles
+  const microBubbles = makeRisingParticles(THREE, 0xe0f8ff, 250, 50);
+  microBubbles.material.size = 0.12;
+  microBubbles.material.opacity = 0.5;
+  root.add(microBubbles);
+  dynamicTickers.push((t,dt) => updateRisingParticles(microBubbles, dt*0.5));
+
+  // Caustic light floor pattern
+  addCausticFloor(THREE, root, dynamicTickers);
 
   // Fish
   for (let i=0;i<12;i++){
@@ -1522,6 +1664,12 @@ function buildChangAn(api) {
   // Mountains distant
   addDistantMountains(THREE, root, 0x6a4028, 220, 16);
 
+  // Sky lanterns rising into the evening sky (signature element)
+  addSkyLanterns(THREE, root, dynamicTickers, 22, 0xff4010);
+
+  // Warm sunset clouds
+  addAnimatedClouds(THREE, root, dynamicTickers, 0xffcca0, 130, 0.4);
+
   return { spawn: new THREE.Vector3(0, 0, 10), spawnYaw: Math.PI };
 }
 function hangingLantern(THREE, root, x, z, color) {
@@ -1628,6 +1776,9 @@ function buildVenice(api) {
   // Soft morning mist
   const mist = makeFogParticles(THREE, 0xe4dfe8, 1);
   root.add(mist);
+
+  // Morning clouds over the canal
+  addAnimatedClouds(THREE, root, dynamicTickers, 0xfff0e8, 110, 0.42);
 
   return { spawn: new THREE.Vector3(0, 0, 8), spawnYaw: Math.PI };
 }
@@ -1762,6 +1913,13 @@ function buildSpaceStation(api) {
   sun.position.copy(sunPos);
   root.add(sun);
 
+  // Comet / satellite streaks across the sky
+  addCometStreaks(THREE, root, dynamicTickers, 5);
+
+  // Starfield twinkle via animated opacity
+  const starMat = stars.material;
+  dynamicTickers.push((t) => { starMat.opacity = 0.85 + Math.sin(t*0.7)*0.15; });
+
   return { spawn: new THREE.Vector3(0, 0, 20), spawnYaw: Math.PI };
 }
 function makeStarSphere(THREE) {
@@ -1783,4 +1941,250 @@ function makeStarSphere(THREE) {
   g.setAttribute('color', new THREE.BufferAttribute(col, 3));
   const m = new THREE.PointsMaterial({ size: 1.5, vertexColors: true, transparent: true, opacity: 1, sizeAttenuation: true, depthWrite: false, blending: THREE.AdditiveBlending });
   return new THREE.Points(g, m);
+}
+
+// ============================================================
+// SHARED ATMOSPHERIC HELPERS
+// ============================================================
+
+// Animated procedural cloud layer — add to daytime/outdoor worlds
+function addAnimatedClouds(THREE, root, dynamicTickers, cloudColor, height, opacity) {
+  height  = height  ?? 120;
+  opacity = opacity ?? 0.55;
+  const cloudMat = new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false,
+    uniforms: {
+      uTime:   { value: 0 },
+      uColor:  { value: new THREE.Color(cloudColor ?? 0xffffff) },
+      uOpacity:{ value: opacity },
+    },
+    vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
+    fragmentShader: `
+      varying vec2 vUv; uniform float uTime; uniform vec3 uColor; uniform float uOpacity;
+      float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+      float noise(vec2 p){
+        vec2 i=floor(p), f=fract(p);
+        float a=hash(i),b=hash(i+vec2(1,0)),c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1));
+        vec2 u=f*f*(3.-2.*f); return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);
+      }
+      float fbm(vec2 p){
+        float v=0.,a=0.5;
+        for(int i=0;i<5;i++){ v+=a*noise(p); p*=2.; a*=0.5; }
+        return v;
+      }
+      void main(){
+        vec2 p = vUv * 3.5 + vec2(uTime*0.012, uTime*0.007);
+        float c = fbm(p);
+        c = smoothstep(0.44, 0.72, c);
+        gl_FragColor = vec4(uColor, c * uOpacity);
+      }
+    `,
+  });
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000), cloudMat);
+  plane.rotation.x = -Math.PI/2; plane.position.y = height;
+  root.add(plane);
+  dynamicTickers.push((t) => { cloudMat.uniforms.uTime.value = t; });
+}
+
+// Fireflies — softly glowing point-light orbs that float and blink
+function addFireflies(THREE, root, dynamicTickers, count, spread, height, color) {
+  count = count ?? 35; spread = spread ?? 25; height = height ?? 3;
+  color = color ?? 0xa8ff70;
+  const lights = [];
+  for (let i=0; i<count; i++){
+    const l = new THREE.PointLight(color, 0, 5);
+    l.userData.phase = Math.random()*Math.PI*2;
+    l.userData.orbitR = 3 + Math.random()*spread;
+    l.userData.orbitA = Math.random()*Math.PI*2;
+    l.userData.speed  = 0.25 + Math.random()*0.4;
+    l.userData.baseY  = 0.5 + Math.random()*height;
+    l.position.set(Math.cos(l.userData.orbitA)*l.userData.orbitR, l.userData.baseY, Math.sin(l.userData.orbitA)*l.userData.orbitR);
+    const mesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.04, 6, 4),
+      new THREE.MeshBasicMaterial({ color })
+    );
+    l.add(mesh);
+    root.add(l); lights.push(l);
+  }
+  dynamicTickers.push((t) => {
+    lights.forEach(l => {
+      l.userData.orbitA += l.userData.speed * 0.007;
+      l.position.x = Math.cos(l.userData.orbitA)*l.userData.orbitR;
+      l.position.z = Math.sin(l.userData.orbitA)*l.userData.orbitR;
+      l.position.y = l.userData.baseY + Math.sin(t*1.3 + l.userData.phase)*0.6;
+      const blink = Math.max(0, Math.sin(t*2.8 + l.userData.phase));
+      l.intensity = blink * blink * 0.7;
+    });
+  });
+}
+
+// Snowfall particles
+function addSnowfall(THREE, root, dynamicTickers, count, spread) {
+  count = count ?? 600; spread = spread ?? 65;
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(count*3), vel = new Float32Array(count*3);
+  for (let i=0;i<count;i++){
+    pos[i*3]   = (Math.random()-0.5)*spread*2;
+    pos[i*3+1] = Math.random()*30;
+    pos[i*3+2] = (Math.random()-0.5)*spread*2;
+    vel[i*3]   = (Math.random()-0.5)*0.25;
+    vel[i*3+1] = -(0.15 + Math.random()*0.25);
+    vel[i*3+2] = (Math.random()-0.5)*0.25;
+  }
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.userData.vel = vel; geo.userData.spread = spread;
+  const mat = new THREE.PointsMaterial({ color: 0xeef2ff, size: 0.28, transparent: true, opacity: 0.88, depthWrite: false });
+  const snow = new THREE.Points(geo, mat);
+  root.add(snow);
+  dynamicTickers.push((t, dt) => updateFallingParticles(snow, dt));
+}
+
+// Rising sky lanterns (paper lanterns that float upward)
+function addSkyLanterns(THREE, root, dynamicTickers, count, color) {
+  count = count ?? 18; color = color ?? 0xff6020;
+  const mat = new THREE.MeshStandardMaterial({
+    color, emissive: color, emissiveIntensity: 1.4,
+    roughness: 0.6, transparent: true, opacity: 0.88,
+  });
+  const lanterns = [];
+  for (let i=0;i<count;i++){
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.28, 0.7, 10), mat));
+    const top = new THREE.Mesh(new THREE.SphereGeometry(0.36, 10, 6, 0, Math.PI*2, 0, Math.PI/2), mat);
+    top.position.y = 0.35; g.add(top);
+    const bot = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.28, 0.18, 8), mat);
+    bot.position.y = -0.45; g.add(bot);
+    const gl = new THREE.PointLight(color, 0.7, 7);
+    g.add(gl);
+    g.position.set((Math.random()-0.5)*60, 4 + Math.random()*14, (Math.random()-0.5)*60);
+    g.userData.driftX = (Math.random()-0.5)*0.2;
+    g.userData.driftZ = (Math.random()-0.5)*0.2;
+    g.userData.phase  = Math.random()*Math.PI*2;
+    root.add(g); lanterns.push(g);
+  }
+  dynamicTickers.push((t, dt) => {
+    lanterns.forEach(l => {
+      l.position.y += 0.7 * dt;
+      l.position.x += l.userData.driftX * dt;
+      l.position.z += l.userData.driftZ * dt;
+      l.rotation.y += dt * 0.15;
+      if (l.position.y > 90) {
+        l.position.set((Math.random()-0.5)*60, 1, (Math.random()-0.5)*60);
+      }
+    });
+  });
+}
+
+// God rays — volumetric cone-shaped light shafts
+function addGodRays(THREE, root, dynamicTickers, origin, color, count, length) {
+  count = count ?? 6; length = length ?? 120; color = color ?? 0xfff0d0;
+  const mats = [];
+  for (let i=0;i<count;i++){
+    const spread = 0.3;
+    const mat = new THREE.MeshBasicMaterial({
+      color, transparent: true, opacity: 0.03 + Math.random()*0.025,
+      depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+    });
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(10 + Math.random()*6, length, 4, 1, true), mat);
+    cone.position.copy(origin || new THREE.Vector3(0, 80, 0));
+    cone.rotation.z = (i/count)*Math.PI*2 * spread - spread*Math.PI;
+    cone.rotation.x = 0.25;
+    cone.rotation.y = (i/count)*Math.PI*2;
+    root.add(cone); mats.push({ mat, base: mat.opacity });
+  }
+  dynamicTickers.push((t) => {
+    mats.forEach((m, i) => { m.mat.opacity = m.base * (0.8 + Math.sin(t*0.3 + i*1.1)*0.2); });
+  });
+}
+
+// Underwater caustic light pattern on floor
+function addCausticFloor(THREE, root, dynamicTickers) {
+  const mat = new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    uniforms: { uTime: { value: 0 } },
+    vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
+    fragmentShader: `
+      varying vec2 vUv; uniform float uTime;
+      float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+      float noise(vec2 p){ vec2 i=floor(p),f=fract(p); float a=hash(i),b=hash(i+vec2(1,0)),c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1)); vec2 u=f*f*(3.-2.*f); return mix(mix(a,b,u.x),mix(c,d,u.x),u.y); }
+      void main(){
+        vec2 p = vUv*14.0 + vec2(uTime*0.12, uTime*0.09);
+        float n1 = noise(p);
+        float n2 = noise(p*2.0 + vec2(1.7, 0.4));
+        float caustic = pow(abs(sin(n1*6.28 + uTime)), 5.0) * pow(abs(sin(n2*3.14 - uTime*0.5)), 2.0);
+        gl_FragColor = vec4(0.4, 0.85, 1.0, caustic * 0.22);
+      }
+    `,
+  });
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), mat);
+  plane.rotation.x = -Math.PI/2; plane.position.y = 0.03;
+  root.add(plane);
+  // Animated overhead light beams for caustic depth
+  for (let i=0;i<5;i++){
+    const beam = new THREE.PointLight(0x80e0ff, 0.6, 40);
+    beam.position.set((i-2)*20, 20, -40);
+    beam.userData.phase = i*1.2;
+    root.add(beam);
+    dynamicTickers.push((t) => {
+      beam.intensity = 0.4 + Math.sin(t*0.9 + beam.userData.phase)*0.25;
+      beam.position.x = (i-2)*20 + Math.sin(t*0.4 + beam.userData.phase)*5;
+    });
+  }
+  dynamicTickers.push((t) => { mat.uniforms.uTime.value = t; });
+}
+
+// Comet / satellite streaking across sky
+function addCometStreaks(THREE, root, dynamicTickers, count) {
+  count = count ?? 4;
+  const comets = [];
+  for (let i=0;i<count;i++){
+    const geo = new THREE.BufferGeometry();
+    const pts = new Float32Array(6);
+    geo.setAttribute('position', new THREE.BufferAttribute(pts, 3));
+    const mat = new THREE.LineBasicMaterial({
+      color: 0xffffff, transparent: true, opacity: 0.0,
+      blending: THREE.AdditiveBlending, depthWrite: false,
+    });
+    const line = new THREE.Line(geo, mat);
+    const comet = {
+      line, geo, mat,
+      active: false,
+      phase: Math.random()*Math.PI*2,
+      interval: 6 + Math.random()*8,
+      progress: 0,
+      startX: (Math.random()-0.5)*400,
+      startY: 100 + Math.random()*80,
+      startZ: (Math.random()-0.5)*400,
+      dx: (Math.random()-0.5)*2,
+      dy: -(0.4 + Math.random()*0.3),
+      dz: (Math.random()-0.5)*2,
+    };
+    root.add(line);
+    comets.push(comet);
+  }
+  let tLast = 0;
+  dynamicTickers.push((t, dt) => {
+    comets.forEach((c, ci) => {
+      if (!c.active && t > tLast + c.interval && ci === 0) {
+        c.active = true; c.progress = 0; tLast = t;
+      }
+      if (!c.active) return;
+      c.progress += dt * 40;
+      const px = c.startX + c.dx * c.progress;
+      const py = c.startY + c.dy * c.progress;
+      const pz = c.startZ + c.dz * c.progress;
+      const pts = c.geo.attributes.position.array;
+      pts[0] = px; pts[1] = py; pts[2] = pz;
+      pts[3] = px - c.dx*25; pts[4] = py - c.dy*25; pts[5] = pz - c.dz*25;
+      c.geo.attributes.position.needsUpdate = true;
+      c.mat.opacity = Math.min(0.9, c.progress / 8) * Math.max(0, 1 - c.progress/60);
+      if (c.progress > 70) {
+        c.active = false; c.mat.opacity = 0;
+        c.startX = (Math.random()-0.5)*400;
+        c.startY = 100 + Math.random()*80;
+        c.startZ = (Math.random()-0.5)*400;
+        c.interval = 5 + Math.random()*10;
+      }
+    });
+  });
 }

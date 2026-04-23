@@ -4,6 +4,11 @@
 import * as THREE from 'three';
 import { WORLDS, getWorld } from './worlds.js';
 import { buildWorld } from './worldbuilder.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 // ------------------------------------------------------------
 // Global state
@@ -63,7 +68,49 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight, false);
   camera.aspect = window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
+  composer.setSize(window.innerWidth, window.innerHeight);
 }, { passive: true });
+
+// ============================================================
+// POST-PROCESSING — Bloom + Vignette
+// ============================================================
+const composer = new EffectComposer(renderer);
+const renderPass = new RenderPass(scene, camera);
+composer.addPass(renderPass);
+
+const bloomPass = new UnrealBloomPass(
+  new THREE.Vector2(window.innerWidth, window.innerHeight),
+  0.55,  // strength
+  0.5,   // radius
+  0.35   // threshold
+);
+composer.addPass(bloomPass);
+
+const vignetteShader = {
+  uniforms: {
+    tDiffuse: { value: null },
+    darkness:  { value: 1.5 },
+    offset:    { value: 1.0 },
+  },
+  vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
+  fragmentShader: `
+    uniform sampler2D tDiffuse;
+    uniform float darkness;
+    uniform float offset;
+    varying vec2 vUv;
+    void main(){
+      vec4 color = texture2D(tDiffuse, vUv);
+      vec2 uv = (vUv - 0.5) * offset;
+      float vg = dot(uv, uv) * darkness;
+      gl_FragColor = vec4(mix(color.rgb, vec3(0.0), vg), color.a);
+    }
+  `,
+};
+const vignettePass = new ShaderPass(vignetteShader);
+composer.addPass(vignettePass);
+
+const outputPass = new OutputPass();
+composer.addPass(outputPass);
 
 // ============================================================
 // LANDING SCENE — floating door in a starfield
@@ -578,6 +625,38 @@ function prepareWorld(w) {
   scene.background = new THREE.Color(p.sky[2] ?? 0x000005);
   scene.fog = new THREE.Fog(p.fog, p.fogNear, p.fogFar);
 
+  // World-specific bloom / exposure
+  const tod = p.timeOfDay;
+  if (tod === 'night-neon') {
+    bloomPass.strength = 2.0; bloomPass.radius = 0.8; bloomPass.threshold = 0.06;
+    renderer.toneMappingExposure = 0.85;
+    vignettePass.uniforms.darkness.value = 1.8;
+  } else if (tod === 'space') {
+    bloomPass.strength = 1.3; bloomPass.radius = 0.7; bloomPass.threshold = 0.12;
+    renderer.toneMappingExposure = 1.0;
+    vignettePass.uniforms.darkness.value = 2.0;
+  } else if (tod === 'underwater') {
+    bloomPass.strength = 0.8; bloomPass.radius = 0.6; bloomPass.threshold = 0.2;
+    renderer.toneMappingExposure = 0.9;
+    vignettePass.uniforms.darkness.value = 2.2;
+  } else if (tod === 'mars-day') {
+    bloomPass.strength = 0.5; bloomPass.radius = 0.5; bloomPass.threshold = 0.4;
+    renderer.toneMappingExposure = 1.1;
+    vignettePass.uniforms.darkness.value = 1.3;
+  } else if (tod === 'golden' || tod === 'dusk' || tod === 'sunset') {
+    bloomPass.strength = 0.7; bloomPass.radius = 0.55; bloomPass.threshold = 0.28;
+    renderer.toneMappingExposure = 1.1;
+    vignettePass.uniforms.darkness.value = 1.4;
+  } else if (tod === 'overcast') {
+    bloomPass.strength = 0.3; bloomPass.radius = 0.4; bloomPass.threshold = 0.5;
+    renderer.toneMappingExposure = 0.95;
+    vignettePass.uniforms.darkness.value = 1.6;
+  } else {
+    bloomPass.strength = 0.4; bloomPass.radius = 0.45; bloomPass.threshold = 0.38;
+    renderer.toneMappingExposure = 1.05;
+    vignettePass.uniforms.darkness.value = 1.4;
+  }
+
   // Sky dome
   if (built.skyDome) worldHost.add(built.skyDome);
 
@@ -643,6 +722,12 @@ function leaveWorld() {
     landingGroup.visible = true;
     scene.background = new THREE.Color(0x000005);
     scene.fog = null;
+    // Reset bloom to landing defaults
+    bloomPass.strength = 0.55;
+    bloomPass.radius = 0.5;
+    bloomPass.threshold = 0.35;
+    renderer.toneMappingExposure = 1.05;
+    vignettePass.uniforms.darkness.value = 1.5;
     // Reset landing door
     landingDoor.userData.hinge.rotation.y = 0;
     landingDoor.userData.portalMat.uniforms.uOpacity.value = 0;
@@ -680,7 +765,7 @@ $('#btnShare').addEventListener('click', async () => {
 
 // Screenshot
 $('#btnPhoto').addEventListener('click', () => {
-  renderer.render(scene, camera);
+  composer.render();
   const a = document.createElement('a');
   a.href = canvas.toDataURL('image/png');
   a.download = `warpdoor-${state.selectedWorldId || 'snap'}-${Date.now()}.png`;
@@ -892,7 +977,7 @@ function tick() {
     }
   }
 
-  renderer.render(scene, camera);
+  composer.render();
   requestAnimationFrame(tick);
 }
 
