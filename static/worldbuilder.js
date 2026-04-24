@@ -1398,7 +1398,7 @@ function buildNeoTokyo(api) {
       new THREE.MeshBasicMaterial({ color: neonColors[i%neonColors.length], transparent: true, opacity: 0.7 })
     );
     mark.rotation.x = -Math.PI/2;
-    mark.position.set((i%2===0 ? -4 : 4), 0.02, -5 + i*4.5);
+    mark.position.set((i%2===0 ? -3 : 3), 0.02, -5 + i*4.5);
     root.add(mark);
   }
 
@@ -1408,8 +1408,8 @@ function buildNeoTokyo(api) {
     const h = 22 + Math.random()*28;
     const w = 8 + Math.random()*6;
     const d = 8 + Math.random()*6;
-    cyberTower(THREE, root, -11 - Math.random()*4, z, w, d, h, neonColors, collidables, dynamicTickers);
-    cyberTower(THREE, root,  11 + Math.random()*4, z, w, d, h, neonColors, collidables, dynamicTickers);
+    cyberTower(THREE, root, -8 - Math.random()*3, z, w, d, h, neonColors, collidables, dynamicTickers);
+    cyberTower(THREE, root,  8 + Math.random()*3, z, w, d, h, neonColors, collidables, dynamicTickers);
   }
 
   // Flying cars — more
