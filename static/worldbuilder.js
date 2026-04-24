@@ -1288,8 +1288,8 @@ function buildNYC(api) {
   for (let i=0;i<12;i++){
     const z = -5 - i*22;
     const shade = 0x282018 + Math.floor(Math.random()*0x202020);
-    skyscraper(-13, z, 12+Math.random()*5, 14+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
-    skyscraper( 13, z, 12+Math.random()*5, 14+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
+    skyscraper(-10, z, 10+Math.random()*4, 12+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
+    skyscraper( 10, z, 10+Math.random()*4, 12+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
   }
 
   // Streetlights
