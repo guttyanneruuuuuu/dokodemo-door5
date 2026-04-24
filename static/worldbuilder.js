@@ -1287,7 +1287,7 @@ function buildNYC(api) {
 
   for (let i=0;i<12;i++){
     const z = -5 - i*22;
-    const shade = 0x282018 + Math.floor(Math.random()*0x202020);
+    const shade = 0x4a3828 + Math.floor(Math.random()*0x303030);
     skyscraper(-9, z, 8+Math.random()*3, 10+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
     skyscraper( 9, z, 8+Math.random()*3, 10+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
   }
@@ -1295,8 +1295,8 @@ function buildNYC(api) {
   // Streetlights
   for (let i=0;i<18;i++){
     const z = -8 - i*15;
-    streetlight(THREE, root, -12, z, dynamicTickers);
-    streetlight(THREE, root,  12, z, dynamicTickers);
+    streetlight(THREE, root, -8, z, dynamicTickers);
+    streetlight(THREE, root,  8, z, dynamicTickers);
   }
 
   // Vintage cars
