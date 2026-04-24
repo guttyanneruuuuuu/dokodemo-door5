@@ -1287,7 +1287,7 @@ function buildNYC(api) {
 
   for (let i=0;i<12;i++){
     const z = -5 - i*22;
-    const shade = 0x4a3828 + Math.floor(Math.random()*0x303030);
+    const shade = 0x7a6a58 + Math.floor(Math.random()*0x282828);
     skyscraper(-9, z, 8+Math.random()*3, 10+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
     skyscraper( 9, z, 8+Math.random()*3, 10+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
   }
