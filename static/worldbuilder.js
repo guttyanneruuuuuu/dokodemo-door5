@@ -1224,7 +1224,7 @@ function buildNYC(api) {
 
   // Main street
   const street = new THREE.Mesh(
-    new THREE.PlaneGeometry(18, 320),
+    new THREE.PlaneGeometry(12, 320),
     new THREE.MeshStandardMaterial({ color: 0x282828, roughness: 0.92 })
   );
   street.rotation.x = -Math.PI/2; street.position.y = 0.01;
@@ -1232,7 +1232,7 @@ function buildNYC(api) {
   root.add(street);
 
   // Sidewalks
-  for (let side of [-10, 10]) {
+  for (let side of [-7, 7]) {
     const sidewalk = new THREE.Mesh(
       new THREE.PlaneGeometry(4, 320),
       new THREE.MeshStandardMaterial({ color: 0x5a5448, roughness: 0.88 })
@@ -1288,8 +1288,8 @@ function buildNYC(api) {
   for (let i=0;i<12;i++){
     const z = -5 - i*22;
     const shade = 0x282018 + Math.floor(Math.random()*0x202020);
-    skyscraper(-10, z, 10+Math.random()*4, 12+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
-    skyscraper( 10, z, 10+Math.random()*4, 12+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
+    skyscraper(-9, z, 8+Math.random()*3, 10+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
+    skyscraper( 9, z, 8+Math.random()*3, 10+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
   }
 
   // Streetlights
