@@ -1224,7 +1224,7 @@ function buildNYC(api) {
 
   // Main street
   const street = new THREE.Mesh(
-    new THREE.PlaneGeometry(12, 320),
+    new THREE.PlaneGeometry(8, 320),
     new THREE.MeshStandardMaterial({ color: 0x282828, roughness: 0.92 })
   );
   street.rotation.x = -Math.PI/2; street.position.y = 0.01;
@@ -1232,9 +1232,9 @@ function buildNYC(api) {
   root.add(street);
 
   // Sidewalks
-  for (let side of [-7, 7]) {
+  for (let side of [-5, 5]) {
     const sidewalk = new THREE.Mesh(
-      new THREE.PlaneGeometry(4, 320),
+      new THREE.PlaneGeometry(3, 320),
       new THREE.MeshStandardMaterial({ color: 0x5a5448, roughness: 0.88 })
     );
     sidewalk.rotation.x = -Math.PI/2; sidewalk.position.set(side, 0.015, 0);
@@ -1286,10 +1286,10 @@ function buildNYC(api) {
   }
 
   for (let i=0;i<12;i++){
-    const z = -5 - i*22;
-    const shade = 0x7a6a58 + Math.floor(Math.random()*0x282828);
-    skyscraper(-9, z, 8+Math.random()*3, 10+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
-    skyscraper( 9, z, 8+Math.random()*3, 10+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
+    const z = -3 - i*20;
+    const shade = 0x8a7a68 + Math.floor(Math.random()*0x282828);
+    skyscraper(-7, z, 7+Math.random()*3, 9+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
+    skyscraper( 7, z, 7+Math.random()*3, 9+Math.random()*3, 3+Math.floor(Math.random()*3), shade);
   }
 
   // Streetlights
@@ -1408,8 +1408,8 @@ function buildNeoTokyo(api) {
     const h = 22 + Math.random()*28;
     const w = 8 + Math.random()*6;
     const d = 8 + Math.random()*6;
-    cyberTower(THREE, root, -8 - Math.random()*3, z, w, d, h, neonColors, collidables, dynamicTickers);
-    cyberTower(THREE, root,  8 + Math.random()*3, z, w, d, h, neonColors, collidables, dynamicTickers);
+    cyberTower(THREE, root, -6 - Math.random()*2, z, w, d, h, neonColors, collidables, dynamicTickers);
+    cyberTower(THREE, root,  6 + Math.random()*2, z, w, d, h, neonColors, collidables, dynamicTickers);
   }
 
   // Flying cars — more
