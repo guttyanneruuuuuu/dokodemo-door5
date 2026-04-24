@@ -1408,8 +1408,8 @@ function buildNeoTokyo(api) {
     const h = 22 + Math.random()*28;
     const w = 8 + Math.random()*6;
     const d = 8 + Math.random()*6;
-    cyberTower(THREE, root, -14 - Math.random()*6, z, w, d, h, neonColors, collidables, dynamicTickers);
-    cyberTower(THREE, root,  14 + Math.random()*6, z, w, d, h, neonColors, collidables, dynamicTickers);
+    cyberTower(THREE, root, -11 - Math.random()*4, z, w, d, h, neonColors, collidables, dynamicTickers);
+    cyberTower(THREE, root,  11 + Math.random()*4, z, w, d, h, neonColors, collidables, dynamicTickers);
   }
 
   // Flying cars — more
